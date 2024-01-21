@@ -1,0 +1,26 @@
+FROM debian:bookworm-slim AS builder-root
+
+ARG PID=1145
+
+ENV USER "steam"
+ENV USERDIR "/home/${USER}"
+ENV STEAMCMDDIR "${USERDIR}/steamcmd"
+ENV PATH=${STEAMCMDDIR}:$PATH
+
+RUN apt update && \
+    apt install -y locales nano ca-certificates curl lib32gcc-s1 && \
+    sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
+    dpkg-reconfigure --frontend=noninteractive locales && \
+    useradd -u ${PID} -m steam
+
+FROM builder-root AS builder-user
+USER ${USER}
+WORKDIR ${USERDIR}
+RUN mkdir -p ${STEAMCMDDIR} && \
+    curl -fsSL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf - -C ${STEAMCMDDIR} && \
+    steamcmd.sh +quit && \
+    mkdir -p ${USERDIR}/.steam/sdk32/ && \
+    ln -s ${STEAMCMDDIR}/linux32/steamclient.so ${USERDIR}/.steam/sdk32/steamclient.so && \
+    mkdir -p ${USERDIR}/.steam/sdk64/ && \
+    ln -s ${STEAMCMDDIR}/linux64/steamclient.so ${USERDIR}/.steam/sdk64/steamclient.so && \
+    ln -s ${STEAMCMDDIR}/steamcmd.sh ${STEAMCMDDIR}/steamcmd

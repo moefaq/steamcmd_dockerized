@@ -1,0 +1,28 @@
+FROM debian:bookworm-slim AS builder-root
+
+ARG PID=1145
+
+ENV USER "steam"
+ENV USERDIR "/home/${USER}"
+ENV STEAMCMDDIR "/usr/games"
+ENV PATH=${STEAMCMDDIR}:$PATH
+
+RUN sed -i '/^Components/s/$/\ non-free\ non-free-firmware/' /etc/apt/sources.list.d/debian.sources && \
+    dpkg --add-architecture i386 && \
+    apt update && \
+    apt install -y locales nano ca-certificates sudo && \
+    sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
+    dpkg-reconfigure --frontend=noninteractive locales && \
+    useradd -u ${PID} -m steam && \
+    echo "${USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/steam
+
+FROM builder-root AS builder-user
+USER ${USER}
+WORKDIR ${USERDIR}
+RUN echo steam steam/question select "I AGREE" | sudo debconf-set-selections && \
+    echo steam steam/license note '' | sudo debconf-set-selections && \
+    sudo apt install -y steamcmd && \
+    mkdir -p ${USERDIR}/.steam/sdk32/ && \
+    mkdir -p ${USERDIR}/.steam/sdk64/ && \
+    ln -s ${USERDIR}/.local/share/Steam/steamcmd/linux32/steamclient.so ${USERDIR}/.steam/sdk32/steamclient.so && \
+    ln -s ${USERDIR}/.local/share/Steam/steamcmd/linux64/steamclient.so ${USERDIR}/.steam/sdk64/steamclient.so
