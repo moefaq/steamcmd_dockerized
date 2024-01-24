@@ -25,4 +25,5 @@ RUN echo steam steam/question select "I AGREE" | sudo debconf-set-selections && 
     mkdir -p ${USERDIR}/.steam/sdk32/ && \
     mkdir -p ${USERDIR}/.steam/sdk64/ && \
     ln -s ${USERDIR}/.local/share/Steam/steamcmd/linux32/steamclient.so ${USERDIR}/.steam/sdk32/steamclient.so && \
-    ln -s ${USERDIR}/.local/share/Steam/steamcmd/linux64/steamclient.so ${USERDIR}/.steam/sdk64/steamclient.so
+    ln -s ${USERDIR}/.local/share/Steam/steamcmd/linux64/steamclient.so ${USERDIR}/.steam/sdk64/steamclient.so && \
+    steamcmd +quit

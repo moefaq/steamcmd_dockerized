@@ -23,4 +23,5 @@ RUN mkdir -p ${STEAMCMDDIR} && \
     ln -s ${STEAMCMDDIR}/linux32/steamclient.so ${USERDIR}/.steam/sdk32/steamclient.so && \
     mkdir -p ${USERDIR}/.steam/sdk64/ && \
     ln -s ${STEAMCMDDIR}/linux64/steamclient.so ${USERDIR}/.steam/sdk64/steamclient.so && \
-    ln -s ${STEAMCMDDIR}/steamcmd.sh ${STEAMCMDDIR}/steamcmd
+    ln -s ${STEAMCMDDIR}/steamcmd.sh ${STEAMCMDDIR}/steamcmd && \
+    steamcmd +quit
